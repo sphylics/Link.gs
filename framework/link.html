@@ -1,0 +1,47 @@
+<!--  JSを無効にしてる人のために  -->
+<noscript>
+  <div style="background-color:#ffdddd;color:#990000;padding:1em;border:1px solid #cc0000;font-weight:bold;text-align:center;">
+    このサイトを利用するにはJavaScriptを有効にしてください。
+  </div>
+</noscript>
+
+<script>
+  const BASE_URL = "<?= getAppUrl() ?>";
+
+  // load()は引数をそのままURLとして遷移させるだけに変更
+  function load(content) {
+    // contentは "?page=xxx" などの相対的なURLとして扱う想定
+    window.top.location.href = content;
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll("[href]").forEach(elem => {
+      elem.addEventListener("click", async e => {
+        e.preventDefault();
+        const fullLink = elem.getAttribute("href");
+
+        // クエリとハッシュに分離
+        const match = fullLink.match(/^([^#]*)(#.*)?$/);
+        if (!match) return;
+
+        const queryPart = match[1]; // "?page=xxx" 部分
+        const hashPart = match[2];  // "#id" 部分
+
+        if (queryPart) {
+          if (typeof load === "function") {
+            // BASE_URLを付けずにそのまま渡す
+            await load(queryPart);
+          }
+        }
+
+        if (hashPart) {
+          const targetId = hashPart.slice(1);
+          const targetElem = document.getElementById(targetId);
+          if (targetElem) {
+            targetElem.scrollIntoView({ behavior: "smooth" });
+          }
+        }
+      });
+    });
+  });
+</script>
