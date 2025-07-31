@@ -1,3 +1,5 @@
+// このファイルは実際は.gsファイルです。
+
 function doGet(e) {
   const PAGE = e.parameter.page || "home";  // デフォルトはhome
   try {

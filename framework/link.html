@@ -11,7 +11,7 @@
   // load()は引数をそのままURLとして遷移させるだけに変更
   function load(content) {
     // contentは "?page=xxx" などの相対的なURLとして扱う想定
-    window.top.location.href = content;
+    window.top.location.href = BASE_URL + content;
   }
 
   document.addEventListener("DOMContentLoaded", () => {
