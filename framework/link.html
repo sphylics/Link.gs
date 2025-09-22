@@ -5,43 +5,39 @@
   </div>
 </noscript>
 
-<script>
-  const BASE_URL = "<?= getAppUrl() ?>";
+<script data-code="Link.js">
+const BASE_URL = "<?!= getAppUrl() ?>";
 
-  // load()は引数をそのままURLとして遷移させるだけに変更
-  function load(content) {
-    // contentは "?page=xxx" などの相対的なURLとして扱う想定
-    window.top.location.href = BASE_URL + content;
-  }
+function load(content) {
+  window.top.location.href = BASE_URL + content;
+}
+document.addEventListener("DOMContentLoaded", () => {
+  document.addEventListener("click", async (e) => {
+    // a要素 or [href] を持つ要素を探す
+    const elem = e.target.closest("[href]");
+    if (!elem) return; // [href] じゃなければ無視
 
-  document.addEventListener("DOMContentLoaded", () => {
-    document.querySelectorAll("[href]").forEach(elem => {
-      elem.addEventListener("click", async e => {
-        e.preventDefault();
-        const fullLink = elem.getAttribute("href");
+    const fullLink = elem.getAttribute("href");
+    if (!fullLink || fullLink === "" || fullLink.startsWith("javascript:")) return;
 
-        // クエリとハッシュに分離
-        const match = fullLink.match(/^([^#]*)(#.*)?$/);
-        if (!match) return;
+    e.preventDefault();
 
-        const queryPart = match[1]; // "?page=xxx" 部分
-        const hashPart = match[2];  // "#id" 部分
+    // #で分割
+    const [queryPart, hashPart] = fullLink.split("#");
 
-        if (queryPart) {
-          if (typeof load === "function") {
-            // BASE_URLを付けずにそのまま渡す
-            await load(queryPart);
-          }
-        }
+    // hashのみでqueryなしの場合はスクロールだけ
+    if ((!queryPart || queryPart === "") && hashPart) {
+      const targetElem = document.getElementById(hashPart);
+      if (targetElem) targetElem.scrollIntoView({ behavior: "smooth" });
+      return;
+    }
 
-        if (hashPart) {
-          const targetId = hashPart.slice(1);
-          const targetElem = document.getElementById(targetId);
-          if (targetElem) {
-            targetElem.scrollIntoView({ behavior: "smooth" });
-          }
-        }
-      });
-    });
+    // queryがある場合はページ遷移
+    if (queryPart && queryPart !== "") {
+      await load(queryPart);
+
+      // hashがある場合のスクロールは load() 側で処理する想定
+    }
   });
+});
 </script>
