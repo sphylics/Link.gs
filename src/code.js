@@ -13,14 +13,6 @@ function doGet(e) {
 
     return returnHTML(templateObj, PAGE, ALL_PAGE[PAGE]);
   } catch (error) {
-    log_record(EMAIL, PARAMS, 503);
-
-    let templateObj = {
-      status_code: 503,
-      
-      template_error: "サーバーにエラーが発生したため、使用できませんでした。しばらくしてからもう一度アクセスしてください。",
-    };
-
     return returnHTML(templateObj, "error", "503 Unavailable");
   }
 }
@@ -32,7 +24,6 @@ function getAppUrl() {
 
 // htmlをテンプレートとして返す関数
 function returnHTML(templateObj, file, title) {
-  const now = new Date();
 
   // メインテンプレートの設定と変数注入
   const mainTemplate = HtmlService.createTemplateFromFile(file);
@@ -56,9 +47,7 @@ function returnHTML(templateObj, file, title) {
   const output = HtmlService.createHtmlOutput(finalHtml)
     .setTitle(title)
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
-    .setFaviconUrl(sc_props("favicon"))
-    .addMetaTag("viewport", "width=device-width, initial-scale=1")
-    .addMetaTag("google-site-verification", "spirix | " + now);
+    .addMetaTag("viewport", "width=device-width, initial-scale=1");
 
   return output;
 }
